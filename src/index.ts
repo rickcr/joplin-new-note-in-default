@@ -62,6 +62,9 @@ joplin.plugins.register({
 
 				// Open the newly created note
 				await joplin.commands.execute('openNote', note.id);
+
+				// Focus on the note body for immediate typing
+				await joplin.commands.execute('focusElementNoteBody');
 			},
 		});
 
