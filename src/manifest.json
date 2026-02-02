@@ -1,0 +1,16 @@
+{
+	"manifest_version": 1,
+	"id": "net.reumann.NoteDefault",
+	"app_min_version": "3.5",
+	"version": "1.0.0",
+	"name": "New Note To Default Folder",
+	"description": "Starts a new note in a default folder",
+	"author": "Rick Reumann",
+	"homepage_url": "https://github.com/rickcr/joplin-new-note-in-default",
+	"repository_url": "https://github.com/rickcr/joplin-new-note-in-default",
+	"keywords": [],
+	"categories": [],
+	"screenshots": [],
+	"icons": {},
+	"promo_tile": {}
+}
