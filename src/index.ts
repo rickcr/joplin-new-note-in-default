@@ -19,6 +19,14 @@ joplin.plugins.register({
 				label: 'Default Folder ID',
 				description: 'The ID of the folder where new notes will be created. To find a folder ID, right-click on a notebook and select "Copy external link", then extract the ID from the URL.',
 			},
+			'keyboardShortcut': {
+				value: 'Ctrl+O',
+				type: SettingItemType.String,
+				section: 'newNoteToDefault',
+				public: true,
+				label: 'Keyboard Shortcut',
+				description: 'The keyboard shortcut to create a new note in the default folder. Use format like "Ctrl+O", "Ctrl+Shift+N", "CmdOrCtrl+Alt+N". Requires restart to take effect.',
+			},
 		});
 
 		// Register command to create new note in default folder
@@ -69,6 +77,7 @@ joplin.plugins.register({
 		});
 
 		// Add the command to the Tools menu with keyboard shortcut
-		await joplin.views.menuItems.create('newNoteToDefaultMenuItem', 'newNoteToDefaultFolder', MenuItemLocation.Tools, { accelerator: 'Ctrl+O' });
+		const shortcut = await joplin.settings.value('keyboardShortcut');
+		await joplin.views.menuItems.create('newNoteToDefaultMenuItem', 'newNoteToDefaultFolder', MenuItemLocation.Tools, { accelerator: shortcut });
 	},
 });
