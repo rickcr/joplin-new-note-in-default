@@ -42,37 +42,42 @@ joplin.plugins.register({
 					await dialogs.setHtml(handle, `
 						<div style="padding: 20px; text-align: center;">
 							<h2>No Default Folder Set</h2>
-							<p>Please set a default folder ID in the plugin settings.</p>
-							<p>Go to Tools > Options > New Note to Default Folder</p>
+							<p>Please configure the default folder for new notes:</p>
+							<ol style="text-align: left;">
+								<li>Go to <strong>Tools → Options → New Note to Default Folder</strong></li>
+								<li>Right-click on your desired notebook and select <strong>"Copy external link"</strong></li>
+								<li>Paste the link and extract the folder ID (the long string after "://")</li>
+								<li>Enter that ID in the "Default Folder ID" setting</li>
+							</ol>
 						</div>
 					`);
 					await dialogs.open(handle);
 					return;
 				}
 
-				// Generate timestamp for note title
-				const now = new Date();
-				const month = String(now.getMonth() + 1).padStart(2, '0');
-				const day = String(now.getDate()).padStart(2, '0');
-				const year = String(now.getFullYear()).slice(-2);
-				let hours = now.getHours();
-				const ampm = hours >= 12 ? 'PM' : 'AM';
-				hours = hours % 12 || 12;
-				const minutes = String(now.getMinutes()).padStart(2, '0');
-				const title = `New Note - ${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
+				try {
+					// Verify the folder exists
+					await joplin.data.get(['folders', folderId]);
+				} catch (error) {
+					const dialogs = joplin.views.dialogs;
+					const handle = await dialogs.create('errorDialog');
+					await dialogs.setHtml(handle, `
+						<div style="padding: 20px; text-align: center;">
+							<h2>Invalid Folder ID</h2>
+							<p>The configured folder ID does not exist or is invalid.</p>
+							<p>Please check your settings in <strong>Tools → Options → New Note to Default Folder</strong></p>
+							<p style="color: #888; font-size: 0.9em;">Current ID: ${folderId}</p>
+						</div>
+					`);
+					await dialogs.open(handle);
+					return;
+				}
 
-				// Create new note in the default folder
-				const note = await joplin.data.post(['notes'], null, {
-					parent_id: folderId,
-					title: title,
-					body: '',
-				});
-
-				// Open the newly created note
-				await joplin.commands.execute('openNote', note.id);
-
-				// Focus on the note body for immediate typing
-				await joplin.commands.execute('focusElementNoteBody');
+				// Switch to the default folder, wait for UI, then create new note
+				// This uses Joplin's native newNote which auto-titles from first line
+				await joplin.commands.execute('openFolder', folderId);
+				await new Promise(resolve => setTimeout(resolve, 100));
+				await joplin.commands.execute('newNote');
 			},
 		});
 
